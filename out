@@ -5,6 +5,9 @@ set -e
 exec 3>&1
 exec 1>&2
 
+# path to src for concourse
+src_path=$1
+
 # for jq
 PATH=/usr/local/bin:$PATH
 
@@ -12,11 +15,25 @@ payload=$(mktemp /tmp/resource-in.XXXXXX)
 
 cat > $payload <&0
 
+echo "Payload:" $payload
+
+# source params
 webhook_url=$(jq -r '.source.url' < $payload)
 
-body=$(jq -c '{"text":(.params.text // ""), "username": (.params.username // null), "icon_url": (.params.icon_url // null), "icon_emoji": (.params.icon_emoji // null), "channel": (.params.channel // null)}' < $payload)
+# task params
+text=$(jq '.params.text // ""' < $payload)
+channel=$(jq '.params.channel // null' < $payload)
+username=$(jq '.params.username // null' < $payload)
+icon_url=$(jq '.params.icon_url // null' < $payload)
+icon_emoji=$(jq '.params.icon_emoji // null' < $payload)
+version_file=$(jq -r '.params.version_file // ""' < $payload)
+
+# evaluate variables in the text
+version=$(cat $src_path/$version_file)
+text="\"$(eval echo $text)\""
+
+body="{\"text\": ${text}, \"username\": ${username}, \"icon_url\": ${icon_url}, \"icon_emoji\": ${icon_emoji}, \"channel\": ${channel}}"
 
 curl -X POST --data-urlencode "payload=$body" $webhook_url
 
 jq -n '{version:{ref:0}}' >&3
-

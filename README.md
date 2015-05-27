@@ -1,4 +1,4 @@
-# Slack notification sending resource 
+# Slack notification sending resource
 
 Sends messages to [Slack](https://slack.com).
 
@@ -8,7 +8,7 @@ Sends messages to [Slack](https://slack.com).
 
 ## Behavior
 
-### `out`: Sends message to Slack. 
+### `out`: Sends message to Slack.
 
 Send message to Slack, with the configured parameters.
 
@@ -19,4 +19,6 @@ Send message to Slack, with the configured parameters.
 * `username`: *Optional.* Override name of the sender of the message.
 * `icon_url`: *Optional.* Override icon by providing URL to the image.
 * `icon_emoji`: *Optional.* Override icon by providing emoji code (e.g. `:ghost:`).
+* `version_file`: *Optional.* Loads the version number from a file into
+  a $version environment variable that you can use in your text.
 
